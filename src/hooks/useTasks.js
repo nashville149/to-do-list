@@ -17,10 +17,16 @@ export const useTasks = (userId) => {
     return unsubscribe;
   }, [userId]);
 
-  const addTask = async (title) => {
+  const addTask = async (taskData) => {
     await addDoc(collection(db, 'tasks'), {
-      title,
+      title: taskData.title || taskData,
       completed: false,
+      priority: taskData.priority || 'medium',
+      dueDate: taskData.dueDate || null,
+      startDate: taskData.startDate || null,
+      tags: taskData.tags || [],
+      subtasks: taskData.subtasks || [],
+      projectId: taskData.projectId || null,
       userId,
       createdAt: new Date()
     });
