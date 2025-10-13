@@ -27,9 +27,30 @@ const PomodoroTimer = ({
       </div>
       
       {currentTask && (
-        <p style={{ fontSize: '18px', margin: '10px 0' }}>
-          Working on: <strong>{currentTask.title}</strong>
-        </p>
+        <div style={{ margin: '20px 0' }}>
+          <p style={{ fontSize: '18px', margin: '10px 0' }}>
+            Working on: <strong>{currentTask.title}</strong>
+          </p>
+          <p style={{ fontSize: '14px', color: '#666' }}>
+            Duration: {currentTask.duration || 25} minutes | 
+            Time spent: {currentTask.timeSpent || 0} minutes
+          </p>
+          <div style={{ 
+            width: '100%', 
+            height: '8px', 
+            background: '#eee', 
+            borderRadius: '4px', 
+            margin: '10px 0',
+            overflow: 'hidden'
+          }}>
+            <div style={{ 
+              width: `${Math.min(((currentTask.timeSpent || 0) / (currentTask.duration || 25)) * 100, 100)}%`, 
+              height: '100%', 
+              background: '#FF8A65',
+              transition: 'width 0.3s ease'
+            }} />
+          </div>
+        </div>
       )}
       
       <div style={{ margin: '20px 0' }}>

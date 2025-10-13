@@ -34,6 +34,8 @@ export const useTasks = (userId) => {
       priority: taskData.priority || 'medium',
       dueDate: taskData.dueDate || null,
       startDate: taskData.startDate || null,
+      duration: taskData.duration || 25, // duration in minutes
+      timeSpent: 0, // time spent in minutes
       tags: taskData.tags || [],
       subtasks: taskData.subtasks || [],
       projectId: taskData.projectId || null,

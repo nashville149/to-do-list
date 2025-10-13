@@ -136,6 +136,9 @@ const TaskList = ({ tasks, addTask, updateTask, deleteTask, updateTaskStatus, on
                 <span style={{ color: getPriorityColor(task.priority || 'medium') }}>
                   {(task.priority || 'medium').toUpperCase()}
                 </span>
+                <span style={{ color: '#666' }}>
+                  ⏱️ {task.timeSpent || 0}/{task.duration || 25}min
+                </span>
                 {task.tags?.map(tag => (
                   <span key={tag} style={{ 
                     background: '#FFCCBC', 
@@ -146,13 +149,30 @@ const TaskList = ({ tasks, addTask, updateTask, deleteTask, updateTaskStatus, on
                     {tag}
                   </span>
                 ))}
+                {task.duration && (
+                  <div style={{ 
+                    width: '100%', 
+                    height: '4px', 
+                    background: '#eee', 
+                    borderRadius: '2px', 
+                    marginTop: '5px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ 
+                      width: `${Math.min(((task.timeSpent || 0) / (task.duration || 25)) * 100, 100)}%`, 
+                      height: '100%', 
+                      background: getTaskStatus(task) === 'completed' ? '#4CAF50' : '#FF8A65',
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+                )}
               </div>
             </div>
             <button 
-              onClick={() => onSelectTask(task.id)}
+              onClick={() => onSelectTask(task.id, task)}
               style={{ marginRight: '10px', padding: '8px 12px' }}
             >
-              🍅 Start
+              🍅 Start ({task.duration || 25}m)
             </button>
             <button 
               onClick={() => deleteTask(task.id)}

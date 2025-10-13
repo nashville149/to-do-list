@@ -6,6 +6,7 @@ const TaskForm = ({ addTask, onClose, projects, selectedProject }) => {
     priority: 'medium',
     dueDate: '',
     startDate: '',
+    duration: 25,
     tags: '',
     projectId: selectedProject || ''
   });
@@ -18,6 +19,7 @@ const TaskForm = ({ addTask, onClose, projects, selectedProject }) => {
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
         startDate: formData.startDate ? new Date(formData.startDate) : null,
+        duration: parseInt(formData.duration) || 25,
         projectId: formData.projectId || null
       });
       onClose();
@@ -79,6 +81,18 @@ const TaskForm = ({ addTask, onClose, projects, selectedProject }) => {
           onChange={(e) => setFormData({...formData, startDate: e.target.value})}
           style={{ width: '100%', padding: '10px', margin: '10px 0' }}
         />
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '10px 0' }}>
+          <label style={{ minWidth: '120px' }}>Duration (minutes):</label>
+          <input
+            type="number"
+            min="1"
+            max="480"
+            value={formData.duration}
+            onChange={(e) => setFormData({...formData, duration: e.target.value})}
+            style={{ flex: 1, padding: '10px' }}
+          />
+        </div>
         
         <input
           type="text"

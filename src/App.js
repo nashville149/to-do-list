@@ -12,10 +12,10 @@ import ProjectSelector from './components/ProjectSelector';
 import ProgressStats from './components/ProgressStats';
 
 function App() {
-  const { user, loading, login, register, logout } = useAuth();
+  const { user, loading, login, register, logout, sendVerification } = useAuth();
   const { tasks, addTask, updateTask, deleteTask, updateTaskStatus } = useTasks(user?.uid);
   const { projects, addProject, updateProject, deleteProject } = useProjects(user?.uid);
-  const pomodoroHook = usePomodoro(user?.uid);
+  const pomodoroHook = usePomodoro(user?.uid, updateTask);
   const [activeTab, setActiveTab] = useState('tasks');
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -24,12 +24,48 @@ function App() {
   }
 
   if (!user) {
-    return <Auth login={login} register={register} />;
+    return <Auth login={login} register={register} sendVerification={sendVerification} user={user} />;
   }
 
-  const handleSelectTask = (taskId) => {
+  if (user && !user.emailVerified) {
+    return (
+      <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', textAlign: 'center' }}>
+        <h2>📧 Email Verification Required</h2>
+        <p style={{ margin: '20px 0' }}>Please check your email and click the verification link to continue.</p>
+        <button 
+          onClick={sendVerification}
+          style={{ 
+            padding: '10px 20px', 
+            background: '#FF8A65', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '5px', 
+            cursor: 'pointer',
+            marginRight: '10px'
+          }}
+        >
+          Resend Verification
+        </button>
+        <button 
+          onClick={logout}
+          style={{ 
+            padding: '10px 20px', 
+            background: '#ccc', 
+            color: 'black', 
+            border: 'none', 
+            borderRadius: '5px', 
+            cursor: 'pointer'
+          }}
+        >
+          Logout
+        </button>
+      </div>
+    );
+  }
+
+  const handleSelectTask = (taskId, task) => {
     pomodoroHook.resetTimer();
-    pomodoroHook.startTimer(taskId);
+    pomodoroHook.startTimer(taskId, task);
     setActiveTab('timer');
   };
 
