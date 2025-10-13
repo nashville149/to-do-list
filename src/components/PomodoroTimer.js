@@ -5,10 +5,13 @@ const PomodoroTimer = ({
   isActive, 
   isBreak, 
   currentTaskId, 
+  breakTime,
   startTimer, 
   pauseTimer, 
+  resumeTimer,
   resetTimer, 
   formatTime,
+  formatBreakTime,
   tasks 
 }) => {
   const currentTask = tasks.find(task => task.id === currentTaskId);
@@ -21,10 +24,16 @@ const PomodoroTimer = ({
       borderRadius: '10px',
       margin: '20px'
     }}>
-      <h2>{isBreak ? 'Break Time' : 'Focus Time'}</h2>
+      <h2>{isBreak ? '☕ Break Time' : '🎯 Focus Time'}</h2>
       <div style={{ fontSize: '48px', fontWeight: 'bold', margin: '20px 0' }}>
         {formatTime(timeLeft)}
       </div>
+      
+      {isBreak && (
+        <div style={{ fontSize: '18px', color: '#FF9800', margin: '10px 0' }}>
+          Break duration: {formatBreakTime()}
+        </div>
+      )}
       
       {currentTask && (
         <div style={{ margin: '20px 0' }}>
@@ -56,11 +65,11 @@ const PomodoroTimer = ({
       <div style={{ margin: '20px 0' }}>
         {!isActive ? (
           <button 
-            onClick={() => startTimer(currentTaskId)}
+            onClick={isBreak ? resumeTimer : () => startTimer(currentTaskId)}
             style={{ 
               padding: '15px 30px', 
               fontSize: '18px', 
-              backgroundColor: '#4CAF50', 
+              backgroundColor: isBreak ? '#4CAF50' : '#4CAF50', 
               color: 'white',
               border: 'none',
               borderRadius: '5px',
@@ -68,7 +77,7 @@ const PomodoroTimer = ({
               marginRight: '10px'
             }}
           >
-            Start
+            {isBreak ? 'Resume' : 'Start'}
           </button>
         ) : (
           <button 
@@ -84,7 +93,7 @@ const PomodoroTimer = ({
               marginRight: '10px'
             }}
           >
-            Pause
+            Take Break
           </button>
         )}
         
