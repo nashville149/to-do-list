@@ -101,22 +101,22 @@ const TaskList = ({ tasks, addTask, updateTask, deleteTask, updateTaskStatus, on
             borderLeftColor: getPriorityColor(task.priority)
           }}>
             <div style={{ marginRight: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '18px' }}>{getStatusIcon(getTaskStatus(task))}</span>
-              <select
-                value={getTaskStatus(task)}
-                onChange={(e) => updateTaskStatus(task.id, e.target.value)}
-                style={{ 
-                  padding: '4px 8px', 
-                  fontSize: '12px', 
-                  border: `1px solid ${getStatusColor(getTaskStatus(task))}`,
-                  borderRadius: '4px',
-                  background: 'white'
+              <input
+                type="checkbox"
+                checked={task.completed || getTaskStatus(task) === 'completed'}
+                onChange={(e) => {
+                  const newStatus = e.target.checked ? 'completed' : 'pending';
+                  updateTaskStatus(task.id, newStatus);
                 }}
-              >
-                <option value="pending">Pending</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-              </select>
+                style={{ 
+                  width: '18px', 
+                  height: '18px',
+                  accentColor: getStatusColor(getTaskStatus(task))
+                }}
+              />
+              <span style={{ fontSize: '16px', color: getStatusColor(getTaskStatus(task)) }}>
+                {getStatusIcon(getTaskStatus(task))}
+              </span>
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ 

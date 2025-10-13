@@ -11,6 +11,15 @@ export const useTasks = (userId) => {
     const q = query(collection(db, 'tasks'), where('userId', '==', userId));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const tasksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // Auto-update overdue tasks
+      const now = new Date();
+      tasksData.forEach(task => {
+        if (task.dueDate && new Date(task.dueDate.toDate()) < now && !task.completed && task.status !== 'overdue') {
+          updateDoc(doc(db, 'tasks', task.id), { status: 'overdue' });
+        }
+      });
+      
       setTasks(tasksData);
     });
 
