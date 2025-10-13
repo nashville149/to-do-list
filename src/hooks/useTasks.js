@@ -21,6 +21,7 @@ export const useTasks = (userId) => {
     await addDoc(collection(db, 'tasks'), {
       title: taskData.title || taskData,
       completed: false,
+      status: 'pending', // pending, in-progress, completed, overdue
       priority: taskData.priority || 'medium',
       dueDate: taskData.dueDate || null,
       startDate: taskData.startDate || null,
@@ -40,5 +41,16 @@ export const useTasks = (userId) => {
     await deleteDoc(doc(db, 'tasks', taskId));
   };
 
-  return { tasks, addTask, updateTask, deleteTask };
+  const updateTaskStatus = async (taskId, status) => {
+    const updates = { status };
+    if (status === 'completed') {
+      updates.completed = true;
+      updates.completedAt = new Date();
+    } else {
+      updates.completed = false;
+    }
+    await updateDoc(doc(db, 'tasks', taskId), updates);
+  };
+
+  return { tasks, addTask, updateTask, deleteTask, updateTaskStatus };
 };

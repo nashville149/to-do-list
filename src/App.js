@@ -13,7 +13,7 @@ import ProgressStats from './components/ProgressStats';
 
 function App() {
   const { user, loading, login, register, logout } = useAuth();
-  const { tasks, addTask, updateTask, deleteTask } = useTasks(user?.uid);
+  const { tasks, addTask, updateTask, deleteTask, updateTaskStatus } = useTasks(user?.uid);
   const { projects, addProject, updateProject, deleteProject } = useProjects(user?.uid);
   const pomodoroHook = usePomodoro(user?.uid);
   const [activeTab, setActiveTab] = useState('tasks');
@@ -83,6 +83,7 @@ function App() {
               addTask={addTask}
               updateTask={updateTask}
               deleteTask={deleteTask}
+              updateTaskStatus={updateTaskStatus}
               onSelectTask={handleSelectTask}
               projects={projects}
               selectedProject={selectedProject}

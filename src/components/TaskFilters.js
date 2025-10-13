@@ -41,6 +41,7 @@ const TaskFilters = ({ filters, setFilters, tasks }) => {
       >
         <option value="">All Tasks</option>
         <option value="pending">Pending</option>
+        <option value="in-progress">In Progress</option>
         <option value="completed">Completed</option>
         <option value="overdue">Overdue</option>
       </select>
