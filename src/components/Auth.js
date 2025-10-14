@@ -1,16 +1,38 @@
 import React, { useState } from 'react';
+import { validatePassword, generateSecurePassword } from '../utils/passwordValidator';
 
 const Auth = ({ login, register, sendVerification, user }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [passwordValidation, setPasswordValidation] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handlePasswordChange = (newPassword) => {
+    setPassword(newPassword);
+    if (!isLogin) {
+      setPasswordValidation(validatePassword(newPassword));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
+    
+    if (!isLogin) {
+      if (!passwordValidation?.isValid) {
+        setError('Password does not meet security requirements');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+    }
     
     try {
       if (isLogin) {
@@ -22,6 +44,12 @@ const Auth = ({ login, register, sendVerification, user }) => {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleGeneratePassword = () => {
+    const newPassword = generateSecurePassword();
+    handlePasswordChange(newPassword);
+    setConfirmPassword(newPassword);
   };
 
   const handleResendVerification = async () => {
@@ -51,14 +79,106 @@ const Auth = ({ login, register, sendVerification, user }) => {
           style={{ width: '100%', padding: '10px', margin: '10px 0' }}
           required
         />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%', padding: '10px', margin: '10px 0' }}
-          required
-        />
+        <div style={{ position: 'relative' }}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => handlePasswordChange(e.target.value)}
+            style={{ width: '100%', padding: '10px', margin: '10px 0', paddingRight: '40px' }}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              right: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            {showPassword ? '🙈' : '👁️'}
+          </button>
+        </div>
+        
+        {!isLogin && (
+          <>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+              required
+            />
+            
+            <button
+              type="button"
+              onClick={handleGeneratePassword}
+              style={{
+                width: '100%',
+                padding: '8px',
+                margin: '5px 0',
+                background: 'var(--success)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              🔐 Generate Secure Password
+            </button>
+            
+            {passwordValidation && (
+              <div style={{
+                margin: '10px 0',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '12px'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  marginBottom: '8px'
+                }}>
+                  <span>Password Strength:</span>
+                  <span style={{
+                    color: passwordValidation.strength.color,
+                    fontWeight: 'bold'
+                  }}>
+                    {passwordValidation.strength.text}
+                  </span>
+                </div>
+                
+                <div style={{ fontSize: '11px' }}>
+                  <div style={{ color: passwordValidation.requirements.minLength ? 'green' : 'red' }}>
+                    {passwordValidation.requirements.minLength ? '✓' : '✗'} At least 8 characters
+                  </div>
+                  <div style={{ color: passwordValidation.requirements.hasUppercase ? 'green' : 'red' }}>
+                    {passwordValidation.requirements.hasUppercase ? '✓' : '✗'} Uppercase letter
+                  </div>
+                  <div style={{ color: passwordValidation.requirements.hasLowercase ? 'green' : 'red' }}>
+                    {passwordValidation.requirements.hasLowercase ? '✓' : '✗'} Lowercase letter
+                  </div>
+                  <div style={{ color: passwordValidation.requirements.hasNumber ? 'green' : 'red' }}>
+                    {passwordValidation.requirements.hasNumber ? '✓' : '✗'} Number
+                  </div>
+                  <div style={{ color: passwordValidation.requirements.hasSpecialChar ? 'green' : 'red' }}>
+                    {passwordValidation.requirements.hasSpecialChar ? '✓' : '✗'} Special character
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
         <button type="submit" style={{ width: '100%', padding: '10px', margin: '10px 0' }}>
           {isLogin ? 'Login' : 'Register'}
         </button>
