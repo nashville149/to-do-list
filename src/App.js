@@ -14,6 +14,9 @@ import ProjectSelector from './components/ProjectSelector';
 import ProgressStats from './components/ProgressStats';
 import ThemeSelector from './components/ThemeSelector';
 import DragDropTaskList from './components/DragDropTaskList';
+import FocusMode from './components/FocusMode';
+import GoalsTracker from './components/GoalsTracker';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 
 function App() {
   const { user, loading, login, register, logout, sendVerification } = useAuth();
@@ -96,7 +99,7 @@ function App() {
       </header>
 
       <nav style={{ display: 'flex', borderBottom: '2px solid var(--border)', background: 'var(--cardBg)' }}>
-        {['tasks', 'calendar', 'timer', 'progress', 'dashboard'].map(tab => (
+        {['tasks', 'calendar', 'timer', 'focus', 'goals', 'analytics', 'dashboard'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -182,6 +185,30 @@ function App() {
         {activeTab === 'timer' && (
           <PomodoroTimer
             {...pomodoroHook}
+            tasks={tasks}
+          />
+        )}
+        
+        {activeTab === 'focus' && (
+          <FocusMode
+            tasks={tasks}
+            onSelectTask={handleSelectTask}
+            updateTaskStatus={updateTaskStatus}
+            deleteTask={deleteTask}
+          />
+        )}
+        
+        {activeTab === 'goals' && (
+          <GoalsTracker
+            tasks={tasks}
+            addTask={addTask}
+            updateTask={updateTask}
+          />
+        )}
+        
+        {activeTab === 'analytics' && (
+          <AnalyticsDashboard
+            userId={user.uid}
             tasks={tasks}
           />
         )}
