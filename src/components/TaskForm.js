@@ -7,9 +7,19 @@ const TaskForm = ({ addTask, onClose, projects, selectedProject }) => {
     dueDate: '',
     startDate: '',
     duration: 25,
+    estimatedTime: 25,
+    reminderTime: '',
+    emailReminder: false,
     tags: '',
-    projectId: selectedProject || ''
+    projectId: selectedProject || '',
+    recurring: 'none',
+    notes: '',
+    subtasks: [],
+    checklist: []
   });
+  
+  const [newSubtask, setNewSubtask] = useState('');
+  const [newChecklistItem, setNewChecklistItem] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,7 +30,14 @@ const TaskForm = ({ addTask, onClose, projects, selectedProject }) => {
         dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
         startDate: formData.startDate ? new Date(formData.startDate) : null,
         duration: parseInt(formData.duration) || 25,
-        projectId: formData.projectId || null
+        estimatedTime: parseInt(formData.estimatedTime) || 25,
+        reminderTime: formData.reminderTime ? new Date(formData.reminderTime) : null,
+        emailReminder: formData.emailReminder,
+        projectId: formData.projectId || null,
+        recurring: formData.recurring,
+        notes: formData.notes,
+        subtasks: formData.subtasks,
+        checklist: formData.checklist
       });
       onClose();
     }
@@ -94,6 +111,38 @@ const TaskForm = ({ addTask, onClose, projects, selectedProject }) => {
           />
         </div>
         
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '10px 0' }}>
+          <label style={{ minWidth: '120px' }}>Estimated Time:</label>
+          <input
+            type="number"
+            min="1"
+            max="480"
+            value={formData.estimatedTime}
+            onChange={(e) => setFormData({...formData, estimatedTime: e.target.value})}
+            style={{ flex: 1, padding: '10px' }}
+            placeholder="How long will this take?"
+          />
+          <span style={{ fontSize: '12px', color: '#666' }}>minutes</span>
+        </div>
+        
+        <input
+          type="datetime-local"
+          placeholder="Reminder time"
+          value={formData.reminderTime}
+          onChange={(e) => setFormData({...formData, reminderTime: e.target.value})}
+          style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+        />
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '10px 0' }}>
+          <input
+            type="checkbox"
+            id="emailReminder"
+            checked={formData.emailReminder}
+            onChange={(e) => setFormData({...formData, emailReminder: e.target.checked})}
+          />
+          <label htmlFor="emailReminder">Send email reminder</label>
+        </div>
+        
         <input
           type="text"
           placeholder="Tags (comma separated)"
@@ -112,6 +161,99 @@ const TaskForm = ({ addTask, onClose, projects, selectedProject }) => {
             <option key={project.id} value={project.id}>{project.name}</option>
           ))}
         </select>
+        
+        <select
+          value={formData.recurring}
+          onChange={(e) => setFormData({...formData, recurring: e.target.value})}
+          style={{ width: '100%', padding: '10px', margin: '10px 0' }}
+        >
+          <option value="none">No Repeat</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+        
+        <textarea
+          placeholder="Task notes/description"
+          value={formData.notes}
+          onChange={(e) => setFormData({...formData, notes: e.target.value})}
+          style={{ width: '100%', padding: '10px', margin: '10px 0', minHeight: '60px', resize: 'vertical' }}
+        />
+        
+        <div style={{ margin: '10px 0' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Subtasks:</label>
+          <div style={{ display: 'flex', gap: '5px', marginBottom: '5px' }}>
+            <input
+              type="text"
+              placeholder="Add subtask"
+              value={newSubtask}
+              onChange={(e) => setNewSubtask(e.target.value)}
+              style={{ flex: 1, padding: '8px' }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (newSubtask.trim()) {
+                  setFormData({...formData, subtasks: [...formData.subtasks, { id: Date.now(), text: newSubtask.trim(), completed: false }]});
+                  setNewSubtask('');
+                }
+              }}
+              style={{ padding: '8px 12px', background: '#FF8A65', color: 'white', border: 'none', borderRadius: '4px' }}
+            >
+              Add
+            </button>
+          </div>
+          {formData.subtasks.map(subtask => (
+            <div key={subtask.id} style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '3px' }}>
+              <span style={{ flex: 1, fontSize: '14px' }}>• {subtask.text}</span>
+              <button
+                type="button"
+                onClick={() => setFormData({...formData, subtasks: formData.subtasks.filter(s => s.id !== subtask.id)})}
+                style={{ padding: '2px 6px', background: '#f44336', color: 'white', border: 'none', borderRadius: '3px', fontSize: '12px' }}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+        
+        <div style={{ margin: '10px 0' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Checklist:</label>
+          <div style={{ display: 'flex', gap: '5px', marginBottom: '5px' }}>
+            <input
+              type="text"
+              placeholder="Add checklist item"
+              value={newChecklistItem}
+              onChange={(e) => setNewChecklistItem(e.target.value)}
+              style={{ flex: 1, padding: '8px' }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (newChecklistItem.trim()) {
+                  setFormData({...formData, checklist: [...formData.checklist, { id: Date.now(), text: newChecklistItem.trim(), completed: false }]});
+                  setNewChecklistItem('');
+                }
+              }}
+              style={{ padding: '8px 12px', background: '#FF8A65', color: 'white', border: 'none', borderRadius: '4px' }}
+            >
+              Add
+            </button>
+          </div>
+          {formData.checklist.map(item => (
+            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '3px' }}>
+              <span style={{ flex: 1, fontSize: '14px' }}>☐ {item.text}</span>
+              <button
+                type="button"
+                onClick={() => setFormData({...formData, checklist: formData.checklist.filter(c => c.id !== item.id)})}
+                style={{ padding: '2px 6px', background: '#f44336', color: 'white', border: 'none', borderRadius: '3px', fontSize: '12px' }}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
         
         <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
           <button type="submit" style={{ flex: 1, padding: '12px' }}>Add Task</button>

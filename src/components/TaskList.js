@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import TaskForm from './TaskForm';
 import TaskFilters from './TaskFilters';
+import TaskDetails from './TaskDetails';
+import CalendarIntegration from './CalendarIntegration';
 
 const TaskList = ({ tasks, addTask, updateTask, deleteTask, updateTaskStatus, onSelectTask, projects, selectedProject }) => {
   const [showForm, setShowForm] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [calendarTask, setCalendarTask] = useState(null);
   const [filters, setFilters] = useState({
     search: '',
     priority: '',
@@ -122,9 +126,23 @@ const TaskList = ({ tasks, addTask, updateTask, deleteTask, updateTaskStatus, on
               <div style={{ 
                 textDecoration: task.completed ? 'line-through' : 'none',
                 fontWeight: 'bold',
-                marginBottom: '5px'
-              }}>
+                marginBottom: '5px',
+                cursor: 'pointer'
+              }}
+              onClick={() => setSelectedTask(task)}>
                 {task.title}
+                {task.recurring !== 'none' && <span style={{ marginLeft: '8px' }}>🔄</span>}
+                {task.notes && <span style={{ marginLeft: '8px' }}>📝</span>}
+                {task.subtasks?.length > 0 && (
+                  <span style={{ marginLeft: '8px', fontSize: '12px', color: '#666' }}>
+                    ({task.subtasks.filter(s => s.completed).length}/{task.subtasks.length} subtasks)
+                  </span>
+                )}
+                {task.checklist?.length > 0 && (
+                  <span style={{ marginLeft: '8px', fontSize: '12px', color: '#666' }}>
+                    ✓{task.checklist.filter(c => c.completed).length}/{task.checklist.length}
+                  </span>
+                )}
               </div>
               <div style={{ fontSize: '12px', color: '#666', display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
                 {task.dueDate && (
@@ -138,7 +156,17 @@ const TaskList = ({ tasks, addTask, updateTask, deleteTask, updateTaskStatus, on
                 </span>
                 <span style={{ color: '#666' }}>
                   ⏱️ {task.timeSpent || 0}/{task.duration || 25}min
+                  {task.estimatedTime && task.estimatedTime !== task.duration && (
+                    <span style={{ marginLeft: '5px', fontSize: '11px' }}>
+                      (est: {task.estimatedTime}m)
+                    </span>
+                  )}
                 </span>
+                {task.reminderTime && (
+                  <span style={{ color: '#FF9800', fontSize: '12px' }}>
+                    🔔 {new Date(task.reminderTime.toDate()).toLocaleDateString()}
+                  </span>
+                )}
                 {task.tags?.map(tag => (
                   <span key={tag} style={{ 
                     background: '#FFCCBC', 
@@ -175,6 +203,12 @@ const TaskList = ({ tasks, addTask, updateTask, deleteTask, updateTaskStatus, on
               🍅 Start ({task.duration || 25}m)
             </button>
             <button 
+              onClick={() => setCalendarTask(task)}
+              style={{ marginRight: '10px', padding: '8px 12px', backgroundColor: '#4285f4', color: 'white' }}
+            >
+              📅 Calendar
+            </button>
+            <button 
               onClick={() => deleteTask(task.id)}
               style={{ padding: '8px 12px', backgroundColor: '#f44336', color: 'white' }}
             >
@@ -190,6 +224,21 @@ const TaskList = ({ tasks, addTask, updateTask, deleteTask, updateTaskStatus, on
           onClose={() => setShowForm(false)}
           projects={projects}
           selectedProject={selectedProject}
+        />
+      )}
+      
+      {selectedTask && (
+        <TaskDetails 
+          task={selectedTask}
+          updateTask={updateTask}
+          onClose={() => setSelectedTask(null)}
+        />
+      )}
+      
+      {calendarTask && (
+        <CalendarIntegration 
+          task={calendarTask}
+          onClose={() => setCalendarTask(null)}
         />
       )}
     </div>

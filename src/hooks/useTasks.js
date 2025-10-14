@@ -35,9 +35,16 @@ export const useTasks = (userId) => {
       dueDate: taskData.dueDate || null,
       startDate: taskData.startDate || null,
       duration: taskData.duration || 25, // duration in minutes
+      estimatedTime: taskData.estimatedTime || 25, // estimated time in minutes
       timeSpent: 0, // time spent in minutes
+      reminderTime: taskData.reminderTime || null,
+      emailReminder: taskData.emailReminder || false,
+      reminderSent: false,
       tags: taskData.tags || [],
       subtasks: taskData.subtasks || [],
+      checklist: taskData.checklist || [],
+      notes: taskData.notes || '',
+      recurring: taskData.recurring || 'none',
       projectId: taskData.projectId || null,
       userId,
       createdAt: new Date()

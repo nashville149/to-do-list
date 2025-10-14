@@ -3,6 +3,7 @@ import { useAuth } from './hooks/useAuth';
 import { useTasks } from './hooks/useTasks';
 import { usePomodoro } from './hooks/usePomodoro';
 import { useProjects } from './hooks/useProjects';
+import { useNotifications } from './hooks/useNotifications';
 import Auth from './components/Auth';
 import TaskList from './components/TaskList';
 import PomodoroTimer from './components/PomodoroTimer';
@@ -16,6 +17,7 @@ function App() {
   const { tasks, addTask, updateTask, deleteTask, updateTaskStatus } = useTasks(user?.uid);
   const { projects, addProject, updateProject, deleteProject } = useProjects(user?.uid);
   const pomodoroHook = usePomodoro(user?.uid, updateTask);
+  const { sendNotification } = useNotifications(tasks, user);
   const [activeTab, setActiveTab] = useState('tasks');
   const [selectedProject, setSelectedProject] = useState(null);
 
