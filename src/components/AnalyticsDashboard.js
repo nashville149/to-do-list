@@ -4,6 +4,66 @@ import { useAnalytics } from '../hooks/useAnalytics';
 const AnalyticsDashboard = ({ userId, tasks }) => {
   const analytics = useAnalytics(userId, tasks);
 
+  if (!analytics.hasData) {
+    return (
+      <div style={{ padding: '20px' }}>
+        <h2 style={{ color: 'var(--textPrimary)', marginBottom: '30px' }}>📊 Analytics Dashboard</h2>
+        
+        <div style={{
+          background: 'var(--cardBg)',
+          border: '2px solid var(--border)',
+          borderRadius: '12px',
+          padding: '60px 20px',
+          textAlign: 'center',
+          color: 'var(--textSecondary)'
+        }}>
+          <div style={{ fontSize: '64px', marginBottom: '20px' }}>📊</div>
+          <h3 style={{ color: 'var(--textPrimary)', marginBottom: '15px' }}>No Data Yet</h3>
+          <p style={{ marginBottom: '20px' }}>Start creating and completing tasks to see your analytics!</p>
+          
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+            gap: '20px', 
+            marginTop: '30px',
+            maxWidth: '600px',
+            margin: '30px auto 0'
+          }}>
+            <div style={{
+              padding: '20px',
+              background: 'var(--border)',
+              borderRadius: '8px'
+            }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>📝</div>
+              <div style={{ fontWeight: 'bold', color: 'var(--textPrimary)' }}>Create Tasks</div>
+              <div style={{ fontSize: '12px' }}>Add your first task to get started</div>
+            </div>
+            
+            <div style={{
+              padding: '20px',
+              background: 'var(--border)',
+              borderRadius: '8px'
+            }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>✅</div>
+              <div style={{ fontWeight: 'bold', color: 'var(--textPrimary)' }}>Complete Tasks</div>
+              <div style={{ fontSize: '12px' }}>Mark tasks as done to track progress</div>
+            </div>
+            
+            <div style={{
+              padding: '20px',
+              background: 'var(--border)',
+              borderRadius: '8px'
+            }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>🔥</div>
+              <div style={{ fontWeight: 'bold', color: 'var(--textPrimary)' }}>Build Streaks</div>
+              <div style={{ fontSize: '12px' }}>Complete tasks daily for streaks</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const StatCard = ({ title, value, subtitle, color = 'var(--accent)' }) => (
     <div style={{
       background: 'var(--cardBg)',

@@ -12,7 +12,7 @@ export const useAnalytics = (userId, tasks) => {
   });
 
   useEffect(() => {
-    if (!userId || !tasks.length) return;
+    if (!userId) return;
     calculateAnalytics();
   }, [userId, tasks]);
 
@@ -27,11 +27,27 @@ export const useAnalytics = (userId, tasks) => {
       timeTracking,
       streaks,
       weeklyReport,
-      goals: calculateGoals()
+      goals: calculateGoals(),
+      hasData: tasks && tasks.length > 0
     });
   };
 
   const calculateCompletionStats = () => {
+    if (!tasks || tasks.length === 0) {
+      return {
+        total: 0,
+        completed: 0,
+        pending: 0,
+        overdue: 0,
+        completionRate: 0,
+        byPriority: {
+          high: { total: 0, completed: 0 },
+          medium: { total: 0, completed: 0 },
+          low: { total: 0, completed: 0 }
+        }
+      };
+    }
+    
     const total = tasks.length;
     const completed = tasks.filter(t => t.completed).length;
     const pending = tasks.filter(t => !t.completed && t.status !== 'overdue').length;
@@ -60,6 +76,16 @@ export const useAnalytics = (userId, tasks) => {
   };
 
   const calculateTimeTracking = () => {
+    if (!tasks || tasks.length === 0) {
+      return {
+        totalTimeSpent: 0,
+        totalEstimated: 0,
+        accuracy: 0,
+        dailyTime: {},
+        averageTaskTime: 0
+      };
+    }
+    
     const totalTimeSpent = tasks.reduce((sum, task) => sum + (task.timeSpent || 0), 0);
     const totalEstimated = tasks.reduce((sum, task) => sum + (task.estimatedTime || task.duration || 0), 0);
     const accuracy = totalEstimated > 0 ? Math.round((totalTimeSpent / totalEstimated) * 100) : 0;
@@ -87,6 +113,15 @@ export const useAnalytics = (userId, tasks) => {
   };
 
   const calculateStreaks = () => {
+    if (!tasks || tasks.length === 0) {
+      return {
+        currentStreak: 0,
+        longestStreak: 0,
+        dailyCompletions: 0,
+        totalCompletedTasks: 0
+      };
+    }
+    
     const completedTasks = tasks
       .filter(task => task.completed && task.completedAt)
       .sort((a, b) => new Date(b.completedAt.toDate()) - new Date(a.completedAt.toDate()));
@@ -131,6 +166,16 @@ export const useAnalytics = (userId, tasks) => {
   };
 
   const generateWeeklyReport = () => {
+    if (!tasks || tasks.length === 0) {
+      return {
+        tasksCreated: 0,
+        tasksCompleted: 0,
+        timeSpent: 0,
+        completionRate: 0,
+        mostProductiveDay: { day: 'None', count: 0 }
+      };
+    }
+    
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
     
@@ -168,6 +213,15 @@ export const useAnalytics = (userId, tasks) => {
   };
 
   const calculateGoals = () => {
+    if (!tasks || tasks.length === 0) {
+      return {
+        goalTasks: 0,
+        goalCompleted: 0,
+        habitTasks: 0,
+        habitCompleted: 0
+      };
+    }
+    
     const goalTasks = tasks.filter(task => task.tags?.includes('goal'));
     const habitTasks = tasks.filter(task => task.recurring !== 'none');
     
