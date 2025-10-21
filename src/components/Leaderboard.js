@@ -7,7 +7,7 @@ import {
   formatSuccessRate, 
   getBadgeDisplay,
   getNextBadge 
-} from '../utils/leaderboardFormatters';
+} from '../utils/leaderboardFormatters.ts';
 
 const Leaderboard = ({ userId }) => {
   const [sortBy, setSortBy] = useState('rank');
