@@ -18,6 +18,8 @@ import FocusMode from './components/FocusMode';
 import GoalsTracker from './components/GoalsTracker';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import Leaderboard from './components/Leaderboard';
+import UserProfile from './components/UserProfile';
+import PaymentSetup from './components/PaymentSetup';
 
 function App() {
   const { user, loading, login, register, logout, sendVerification } = useAuth();
@@ -29,6 +31,8 @@ function App() {
   const [activeTab, setActiveTab] = useState('tasks');
   const [selectedProject, setSelectedProject] = useState(null);
   const [showThemeSelector, setShowThemeSelector] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
+  const [showPaymentSetup, setShowPaymentSetup] = useState(false);
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'kanban'
 
   if (loading) {
@@ -94,6 +98,7 @@ function App() {
         <h1>Productivity App</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button onClick={() => setShowThemeSelector(true)} style={{ padding: '8px 12px', fontSize: '12px' }}>🎨 Theme</button>
+          <button onClick={() => setShowUserProfile(true)} style={{ padding: '8px 12px', fontSize: '12px' }}>👤 Profile</button>
           <span style={{ marginRight: '20px', color: 'var(--textPrimary)' }}>Welcome, {user.email}</span>
           <button onClick={logout} style={{ padding: '10px 20px' }}>Logout</button>
         </div>
@@ -235,6 +240,32 @@ function App() {
       
       {showThemeSelector && (
         <ThemeSelector onClose={() => setShowThemeSelector(false)} />
+      )}
+      
+      {showUserProfile && (
+        <UserProfile 
+          user={user}
+          onClose={() => setShowUserProfile(false)}
+          onSave={(profileData) => {
+            console.log('Profile saved:', profileData);
+            // In production, save to Firestore
+            if (!profileData.paymentLinked) {
+              setShowPaymentSetup(true);
+            }
+          }}
+        />
+      )}
+      
+      {showPaymentSetup && (
+        <PaymentSetup
+          userId={user.uid}
+          onClose={() => setShowPaymentSetup(false)}
+          onLinked={(paymentInfo) => {
+            console.log('Payment linked:', paymentInfo);
+            // In production, save to Firestore
+            setShowPaymentSetup(false);
+          }}
+        />
       )}
     </div>
   );

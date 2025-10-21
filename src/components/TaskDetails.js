@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { CheckCircle, Upload } from 'lucide-react';
+import TaskAttachments from './TaskAttachments';
+import AIVerification from './AIVerification';
 
 const TaskDetails = ({ task, updateTask, onClose }) => {
   const [editingSubtask, setEditingSubtask] = useState(null);
   const [editingChecklist, setEditingChecklist] = useState(null);
+  const [attachments, setAttachments] = useState(task.attachments || []);
+  const [showVerification, setShowVerification] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState(task.verificationStatus || null);
 
   const toggleSubtask = (subtaskId) => {
     const updatedSubtasks = task.subtasks.map(subtask =>
@@ -16,6 +22,28 @@ const TaskDetails = ({ task, updateTask, onClose }) => {
       item.id === itemId ? { ...item, completed: !item.completed } : item
     );
     updateTask(task.id, { checklist: updatedChecklist });
+  };
+
+  const handleUploadAttachment = (fileData) => {
+    const updatedAttachments = [...attachments, fileData];
+    setAttachments(updatedAttachments);
+    updateTask(task.id, { attachments: updatedAttachments });
+  };
+
+  const handleDeleteAttachment = (fileId) => {
+    const updatedAttachments = attachments.filter(file => file.id !== fileId);
+    setAttachments(updatedAttachments);
+    updateTask(task.id, { attachments: updatedAttachments });
+  };
+
+  const handleVerificationComplete = (result) => {
+    setVerificationStatus(result);
+    updateTask(task.id, { 
+      verificationStatus: result,
+      completed: result.status === 'verified',
+      status: result.status === 'verified' ? 'completed' : 'pending'
+    });
+    setShowVerification(false);
   };
 
   const getRecurringText = (recurring) => {
@@ -51,7 +79,20 @@ const TaskDetails = ({ task, updateTask, onClose }) => {
         border: '2px solid #FFCCBC'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h3 style={{ margin: 0 }}>{task.title}</h3>
+          <h3 style={{ margin: 0, flex: 1 }}>{task.title}</h3>
+          {verificationStatus && (
+            <div style={{
+              padding: '4px 12px',
+              borderRadius: '12px',
+              fontSize: '12px',
+              fontWeight: '500',
+              marginRight: '10px',
+              background: verificationStatus.status === 'verified' ? 'var(--success)' : 'var(--warning)',
+              color: 'white'
+            }}>
+              {verificationStatus.status === 'verified' ? '✓ Verified' : '⏳ Pending Review'}
+            </div>
+          )}
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>×</button>
         </div>
 
@@ -182,6 +223,47 @@ const TaskDetails = ({ task, updateTask, onClose }) => {
           </div>
         )}
 
+        {/* Attachments Section */}
+        <TaskAttachments
+          taskId={task.id}
+          attachments={attachments}
+          onUpload={handleUploadAttachment}
+          onDelete={handleDeleteAttachment}
+        />
+
+        {/* Verification Button */}
+        {!task.completed && !verificationStatus && (
+          <div style={{ marginTop: '20px' }}>
+            <button
+              onClick={() => setShowVerification(true)}
+              disabled={attachments.length === 0}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: attachments.length === 0 ? '#ccc' : 'var(--success)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: attachments.length === 0 ? 'not-allowed' : 'pointer',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              <CheckCircle size={18} />
+              Submit for AI Verification
+            </button>
+            {attachments.length === 0 && (
+              <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--warning)', margin: '8px 0 0 0' }}>
+                Please upload at least one attachment to verify task completion
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Progress Bar */}
         <div style={{ 
           width: '100%', 
           height: '8px', 
@@ -200,6 +282,16 @@ const TaskDetails = ({ task, updateTask, onClose }) => {
         <p style={{ textAlign: 'center', fontSize: '12px', color: '#666', margin: '5px 0 0 0' }}>
           Progress: {Math.min(Math.round(((task.timeSpent || 0) / (task.duration || 25)) * 100), 100)}%
         </p>
+
+        {/* AI Verification Modal */}
+        {showVerification && (
+          <AIVerification
+            task={task}
+            attachments={attachments}
+            onVerify={handleVerificationComplete}
+            onClose={() => setShowVerification(false)}
+          />
+        )}
       </div>
     </div>
   );
