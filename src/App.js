@@ -17,6 +17,7 @@ import DragDropTaskList from './components/DragDropTaskList';
 import FocusMode from './components/FocusMode';
 import GoalsTracker from './components/GoalsTracker';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
+import Leaderboard from './components/Leaderboard';
 
 function App() {
   const { user, loading, login, register, logout, sendVerification } = useAuth();
@@ -98,8 +99,8 @@ function App() {
         </div>
       </header>
 
-      <nav style={{ display: 'flex', borderBottom: '2px solid var(--border)', background: 'var(--cardBg)' }}>
-        {['tasks', 'calendar', 'timer', 'focus', 'goals', 'analytics', 'dashboard'].map(tab => (
+      <nav style={{ display: 'flex', borderBottom: '2px solid var(--border)', background: 'var(--cardBg)', overflowX: 'auto' }}>
+        {['tasks', 'calendar', 'timer', 'focus', 'goals', 'analytics', 'leaderboard', 'dashboard'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -210,6 +211,12 @@ function App() {
           <AnalyticsDashboard
             userId={user.uid}
             tasks={tasks}
+          />
+        )}
+        
+        {activeTab === 'leaderboard' && (
+          <Leaderboard
+            userId={user.uid}
           />
         )}
         
