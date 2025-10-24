@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Trophy, Star, Zap, Target, Crown, ArrowUp, Flame, TrendingUp } from 'lucide-react';
-import { mockQuery } from './leaderboard/leaderboardMockData.ts'; 
+import { mockQuery } from './leaderboardMockData.ts';
 import { 
   // ... functions 
 } from '../utils/leaderboardFormatters.ts';

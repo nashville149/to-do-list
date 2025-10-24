@@ -1,4 +1,4 @@
-import type { BadgeLevel } from '../../types/leaderboard';
+import type { BadgeLevel } from '../types/leaderboard.ts';
 
 // Data passed as props to the root component
 export const mockRootProps = {
