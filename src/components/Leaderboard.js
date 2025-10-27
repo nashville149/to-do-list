@@ -1,13 +1,9 @@
 import { useState } from 'react';
 import { Trophy, Star, Zap, Target, Crown, ArrowUp, Flame, TrendingUp } from 'lucide-react';
-import { mockQuery } from './leaderboard/leaderboardMockData';
+import { mockQuery } from './leaderboardMockData.ts';
 import { 
-  formatPoints, 
-  formatCompletionSpeed, 
-  formatSuccessRate, 
-  getBadgeDisplay,
-  getNextBadge 
-} from '../utils/leaderboardFormatters';
+  // ... functions 
+} from '../utils/leaderboardFormatters.ts';
 
 const Leaderboard = ({ userId }) => {
   const [sortBy, setSortBy] = useState('rank');
